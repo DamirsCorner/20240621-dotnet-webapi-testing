@@ -20,11 +20,21 @@ public class WeatherForecastController : ControllerBase
         "Scorching"
     ];
 
+    private readonly int forecastLength = 5;
+
+    public WeatherForecastController(IConfiguration configuration)
+    {
+        if (int.TryParse(configuration["ForecastLength"], out int length))
+        {
+            forecastLength = length;
+        }
+    }
+
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
         return Enumerable
-            .Range(1, 5)
+            .Range(1, forecastLength)
             .Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using System.Net.Http.Json;
 
 namespace WebApiTesting.Tests;
@@ -11,7 +12,17 @@ public class WebApiTests
     [SetUp]
     public void Setup()
     {
-        factory = new WebApplicationFactory<Program>();
+        factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureAppConfiguration(
+                (context, config) =>
+                {
+                    config.AddInMemoryCollection(
+                        new Dictionary<string, string?> { ["ForecastLength"] = "7" }
+                    );
+                }
+            );
+        });
     }
 
     [Test]
@@ -23,7 +34,7 @@ public class WebApiTests
             "/WeatherForecast"
         );
 
-        weatherForecasts.Should().HaveCount(5);
+        weatherForecasts.Should().HaveCount(7);
     }
 
     [TearDown]
